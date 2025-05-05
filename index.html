@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Moments Carousel</title>
+    <style>
+        /* 
+        ----------------------------------------
+        Date created: May 5, 2025
+        Tool: Claude 3.7 Sonnet
+        Prompt: Create a calmness workout webpage with an auto-advancing carousel for those experiencing burnout, with mindful thoughts and gentle controls.
+        ----------------------------------------
+        */
+        
+        :root {
+            --primary-color: #8e9aaf;
+            --secondary-color: #cbc0d3;
+            --accent-color: #efd3d7;
+            --light-color: #feeafa;
+            --dark-color: #5e6472;
+            --transition-speed: 1.5s;
+            --logo-url: ''; /* Logo URL will be added here later */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all var(--transition-speed) ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-color), var(--accent-color));
+            color: var(--dark-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .introduction {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-weight: 300;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .carousel {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform var(--transition-speed) ease, opacity var(--transition-speed) ease;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .slide.previous {
+            transform: translateX(-100%);
+        }
+        
+        .thought {
+            font-size: 1.5rem;
+            font-weight: 300;
+            max-width: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .play-pause {
+            background: rgba(142, 154, 175, 0.2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 1rem;
+        }
+        
+        .play-pause:hover {
+            background: rgba(142, 154, 175, 0.4);
+        }
+        
+        .play-pause i {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+        }
+        
+        .dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            margin: 0 8px;
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+        }
+        
+        .dot.active {
+            background-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+        
+        @media (max-width: 768px) {
+            .carousel-container {
+                height: 250px;
+            }
+            
+            .thought {
+                font-size: 1.3rem;
+            }
+            
+            .dot {
+                width: 10px;
+                height: 10px;
+                margin: 0 6px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .carousel-container {
+                height: 220px;
+            }
+            
+            .thought {
+                font-size: 1.1rem;
+            }
+            
+            .dot {
+                width: 8px;
+                height: 8px;
+                margin: 0 4px;
+            }
+        }
+
+        /* Styling for slide colors - each slide has a slightly different hue */
+        .slide:nth-child(1) { background: linear-gradient(135deg, #f8f9fa, #e9ecef); }
+        .slide:nth-child(2) { background: linear-gradient(135deg, #e9ecef, #dee2e6); }
+        .slide:nth-child(3) { background: linear-gradient(135deg, #dee2e6, #ced4da); }
+        .slide:nth-child(4) { background: linear-gradient(135deg, #ced4da, #adb5bd); }
+        .slide:nth-child(5) { background: linear-gradient(135deg, #adb5bd, #6c757d); }
+        .slide:nth-child(6) { background: linear-gradient(135deg, #b8c2cc, #97a3b0); }
+        .slide:nth-child(7) { background: linear-gradient(135deg, #d5def2, #c0cde8); }
+        .slide:nth-child(8) { background: linear-gradient(135deg, #e4d7f4, #d4bfed); }
+        .slide:nth-child(9) { background: linear-gradient(135deg, #f3e1e9, #ecc9d8); }
+        .slide:nth-child(10) { background: linear-gradient(135deg, #fcf1f5, #f9e3eb); }
+        .slide:nth-child(11) { background: linear-gradient(135deg, #ecf8f9, #daf1f3); }
+        .slide:nth-child(12) { background: linear-gradient(135deg, #dbf3e8, #c7edd9); }
+        .slide:nth-child(13) { background: linear-gradient(135deg, #ebf5df, #ddefc6); }
+        .slide:nth-child(14) { background: linear-gradient(135deg, #f7f1d9, #f3e9b7); }
+        .slide:nth-child(15) { background: linear-gradient(135deg, #fde9d9, #fcdab7); }
+        .slide:nth-child(16) { background: linear-gradient(135deg, #fde3e1, #fccdca); }
+        .slide:nth-child(17) { background: linear-gradient(135deg, #f7e1ec, #f1c6df); }
+        .slide:nth-child(18) { background: linear-gradient(135deg, #e9e1f7, #d9c5f2); }
+        .slide:nth-child(19) { background: linear-gradient(135deg, #dae1f8, #c0cdf3); }
+        .slide:nth-child(20) { background: linear-gradient(135deg, #d5e8fb, #bcd9f8); }
+        .slide:nth-child(21) { background: linear-gradient(135deg, #d3f5f7, #b3eef2); }
+        
+        /* Footer styles */
+        .footer {
+            margin-top: 2rem;
+            padding: 1rem;
+            text-align: center;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-image: var(https://raw.githubusercontent.com/anandvip/va-retainer/main/valogo.png);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="introduction">
+            <h1>Mindful Moments Practice</h1>
+            <p>This list is designed to help you stay grounded in the present moment, fostering mindfulness and reducing stress. Use these thoughts as gentle reminders to anchor yourself in the here and now, embracing each moment with kindness and clarity.</p>
+        </div>
+        
+        <div class="carousel-container">
+            <div class="carousel">
+                <!-- Slides will be inserted here by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="play-pause" id="playPauseBtn" aria-label="Pause carousel">
+                <i class="pause">❚❚</i>
+            </button>
+        </div>
+        
+        <div class="dots">
+            <!-- Dots will be inserted here by JavaScript -->
+        </div>
+        
+        <div class="footer">
+            <div class="logo-container"></div>
+            <p>Prepared and curated by Vipul Anand</p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * README.md
+         * 
+         * # Mindful Moments Carousel
+         * 
+         * This webpage provides a gentle, calming experience for individuals experiencing burnout or stress.
+         * It presents a series of mindful thoughts in a slow-moving, auto-advancing carousel format.
+         * 
+         * ## Features:
+         * - Slow, gentle transitions between mindfulness prompts
+         * - Auto-advancing carousel with pause/play functionality
+         * - Dot navigation for direct access to specific prompts
+         * - Responsive design for all devices
+         * - Touch-friendly interface
+         * - Auto-resumes after period of inactivity
+         * - Soothing color scheme and gradients
+         * 
+         * ## Purpose:
+         * This tool serves as a digital mindfulness practice that helps users center themselves
+         * in the present moment, providing gentle reminders to stay grounded and practice self-compassion.
+         * The interface is designed to be calming and non-intrusive, matching the peaceful intent of the content.
+         */
+        
+        // Mindful thoughts array
+        const mindfulThoughts = [
+            "I am here, fully present.",
+            "With each breath, I calm my mind.",
+            "I notice the sights, sounds, and sensations around me.",
+            "I let go of future worries and stay present.",
+            "I accept this moment without judgment.",
+            "I am grateful for this present moment.",
+            "I feel the ground beneath me, staying grounded.",
+            "With each exhale, I release tension.",
+            "I am kind to myself, just as I am.",
+            "Peace is here in this very moment.",
+            "I observe my thoughts without attachment.",
+            "I embrace the present without expectations.",
+            "I focus on one task, giving it my full attention.",
+            "I am patient with myself and the process.",
+            "I find joy in the simplicity of now.",
+            "I trust in my ability to handle whatever comes.",
+            "I am safe in this moment.",
+            "I choose to focus on what I can control.",
+            "I release any need for perfection.",
+            "I am strong and capable in this present moment.",
+            "When you are at peace (who am I), let not the external conditioning affect you."
+        ];
+
+        // DOM elements
+        const carousel = document.querySelector('.carousel');
+        const dotsContainer = document.querySelector('.dots');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playPauseIcon = playPauseBtn.querySelector('i');
+
+        // Variables
+        let currentSlide = 0;
+        let isPlaying = true;
+        let slideInterval;
+        let inactivityTimer;
+        const slideDelay = 8000; // 8 seconds per slide
+        const inactivityDelay = 30000; // 30 seconds of inactivity before auto-resuming
+
+        // Initialize slides
+        function initSlides() {
+            // Create slides
+            mindfulThoughts.forEach((thought, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                if (index === 0) slide.classList.add('active');
+                
+                const thoughtElement = document.createElement('p');
+                thoughtElement.className = 'thought';
+                thoughtElement.textContent = thought;
+                
+                slide.appendChild(thoughtElement);
+                carousel.appendChild(slide);
+                
+                // Create dot
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        // Go to specific slide
+        function goToSlide(index) {
+            // Reset user inactivity timer
+            resetInactivityTimer();
+            
+            // Remove active class from all slides and dots
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                slide.classList.remove('previous');
+            });
+            
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            // Set previous slide
+            if (currentSlide !== index) {
+                slides[currentSlide].classList.add('previous');
+            }
+            
+            // Set new current slide
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+
+        // Next slide
+        function nextSlide() {
+            let nextIndex = currentSlide + 1;
+            if (nextIndex >= mindfulThoughts.length) {
+                nextIndex = 0;
+            }
+            goToSlide(nextIndex);
+        }
+
+        // Start auto-sliding
+        function startSliding() {
+            if (!isPlaying) {
+                isPlaying = true;
+                playPauseIcon.textContent = '❚❚'; // Pause icon
+                playPauseBtn.setAttribute('aria-label', 'Pause carousel');
+                slideInterval = setInterval(nextSlide, slideDelay);
+            }
+        }
+
+        // Stop auto-sliding
+        function stopSliding() {
+            if (isPlaying) {
+                isPlaying = false;
+                playPauseIcon.textContent = '▶'; // Play icon
+                playPauseBtn.setAttribute('aria-label', 'Play carousel');
+                clearInterval(slideInterval);
+            }
+        }
+
+        // Toggle play/pause
+        function togglePlayPause() {
+            if (isPlaying) {
+                stopSliding();
+            } else {
+                startSliding();
+            }
+            
+            // Reset inactivity timer
+            resetInactivityTimer();
+        }
+
+        // Reset inactivity timer
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                if (!isPlaying) {
+                    startSliding(); // Auto-resume after inactivity
+                }
+            }, inactivityDelay);
+        }
+
+        // Handle user interactions
+        function handleUserInteraction() {
+            resetInactivityTimer();
+        }
+
+        // Initialize
+        function init() {
+            initSlides();
+            slideInterval = setInterval(nextSlide, slideDelay);
+            
+            // Event listeners
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            
+            // Track user activity
+            document.addEventListener('click', handleUserInteraction);
+            document.addEventListener('touchstart', handleUserInteraction);
+            document.addEventListener('mousemove', handleUserInteraction);
+            document.addEventListener('keydown', handleUserInteraction);
+            
+            // Set initial inactivity timer
+            resetInactivityTimer();
+        }
+
+        // Start everything when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
