@@ -356,43 +356,143 @@
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .sidebar {
                 transform: translateX(-100%);
-                transition: transform 0.3s ease;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 300px;
+                position: fixed;
             }
             
             .sidebar.open {
                 transform: translateX(0);
+                box-shadow: 2px 0 20px rgba(0,0,0,0.5);
             }
+            
+            .sidebar.open .nav-link {
+                animation: slideInNav 0.3s ease forwards;
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            
+            .sidebar.open .nav-link:nth-child(1) { animation-delay: 0.05s; }
+            .sidebar.open .nav-link:nth-child(2) { animation-delay: 0.1s; }
+            .sidebar.open .nav-link:nth-child(3) { animation-delay: 0.15s; }
+            .sidebar.open .nav-link:nth-child(4) { animation-delay: 0.2s; }
+            .sidebar.open .nav-link:nth-child(5) { animation-delay: 0.25s; }
             
             .main-content {
                 margin-left: 0;
                 max-width: 100%;
-                padding: 1rem 1.5rem;
+                padding: 4rem 1.5rem 1rem 1.5rem;
             }
-            
+        }
+
+        @media (max-width: 768px) {
             .main-title {
                 font-size: 2.5rem;
             }
             
-            .mobile-toggle {
-                display: block;
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1001;
-                background: var(--accent-color);
-                color: white;
-                border: none;
-                padding: 0.5rem;
-                border-radius: 4px;
-                cursor: pointer;
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .protocol-title {
+                font-size: 1.5rem;
+                padding: 0.8rem;
+            }
+            
+            .highlight-box, .warning-box, .balance-note, .reality-check {
+                margin: 1.5rem 0;
+                padding: 1rem;
+                font-size: 0.95rem;
+            }
+            
+            .check-questions li {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+        }
+
+        @keyframes slideInNav {
+            to {
+                opacity: 1;
+                transform: translateX(0);
             }
         }
 
         .mobile-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: linear-gradient(135deg, var(--accent-color), #ff8560);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            transition: all 0.3s ease;
+            width: 48px;
+            height: 48px;
+        }
+
+        .mobile-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+        }
+
+        .mobile-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .mobile-toggle.open {
+            background: linear-gradient(135deg, #ff4444, #ff6666);
+            transform: rotate(90deg);
+        }
+
+        /* Hide mobile toggle on larger screens */
+        @media (min-width: 901px) {
+            .mobile-toggle {
+                display: none;
+            }
+        }
+
+        /* Mobile overlay */
+        .mobile-overlay {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-overlay.active {
+                display: block;
+                opacity: 1;
+            }
+            
+            .progress-bar {
+                left: 0;
+                width: 100%;
+                top: 80px; /* Account for mobile toggle button */
+            }
         }
 
         /* Smooth animations */
@@ -422,6 +522,7 @@
             .progress-bar {
                 left: 0;
                 width: 100%;
+                top: 80px; /* Account for mobile toggle button */
             }
         }
     </style>
@@ -430,6 +531,7 @@
     <div class="progress-bar" id="progressBar"></div>
     
     <button class="mobile-toggle" id="mobileToggle">☰</button>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
     
     <div class="container">
         <aside class="sidebar" id="sidebar">
@@ -1008,10 +1110,34 @@
         // Mobile menu toggle
         const mobileToggle = document.getElementById('mobileToggle');
         const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        
+        function openMobileMenu() {
+            sidebar.classList.add('open');
+            mobileOverlay.classList.add('active');
+            mobileToggle.classList.add('open');
+            mobileToggle.innerHTML = '✕';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        function closeMobileMenu() {
+            sidebar.classList.remove('open');
+            mobileOverlay.classList.remove('active');
+            mobileToggle.classList.remove('open');
+            mobileToggle.innerHTML = '☰';
+            document.body.style.overflow = ''; // Restore scrolling
+        }
         
         mobileToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                closeMobileMenu();
+            } else {
+                openMobileMenu();
+            }
         });
+        
+        // Close menu when clicking overlay
+        mobileOverlay.addEventListener('click', closeMobileMenu);
         
         // Navigation functionality
         const navLinks = document.querySelectorAll('.nav-link');
@@ -1038,8 +1164,8 @@
                 }
                 
                 // Close mobile menu
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('open');
+                if (window.innerWidth <= 900) {
+                    closeMobileMenu();
                 }
             });
         });
@@ -1106,17 +1232,18 @@
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
+                closeMobileMenu();
             }
         });
         
         // Auto-close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && 
+            if (window.innerWidth <= 900 && 
                 sidebar.classList.contains('open') && 
                 !sidebar.contains(e.target) && 
-                !mobileToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
+                !mobileToggle.contains(e.target) &&
+                !mobileOverlay.contains(e.target)) {
+                closeMobileMenu();
             }
         });
     </script>
